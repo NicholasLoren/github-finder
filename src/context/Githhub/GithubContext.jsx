@@ -9,6 +9,7 @@ export const GithubContextProvider = ({ children }) => {
   const initialState = {
     users: [],
     isLoading: false,
+    user: {},
   }
   const [state, dispatch] = useReducer(GithubReducer, initialState)
 
@@ -28,6 +29,21 @@ export const GithubContextProvider = ({ children }) => {
       payload: items,
     })
   }
+  //get user details
+  const getUser = async (login) => {
+    setLoading()
+    const response = await fetch(`${url}/users/${login}`, {
+      headers: {
+        Authorization: `token ${token}`,
+      },
+    })
+
+    const data = await response.json()
+    dispatch({
+      type: 'GET_USER',
+      payload: data,
+    })
+  }
   //clear all users in our results
   const clearUsers = () => dispatch({ type: 'CLEAR_USERS' })
   //set loading animation
@@ -36,9 +52,11 @@ export const GithubContextProvider = ({ children }) => {
     <GithubContext.Provider
       value={{
         users: state.users,
+        user: state.user,
         isLoading: state.isLoading,
         searchUsers,
         clearUsers,
+        getUser,
       }}
     >
       {children}
