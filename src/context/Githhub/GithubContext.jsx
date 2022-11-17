@@ -1,4 +1,5 @@
 import { createContext, useReducer } from 'react'
+import { Navigate } from 'react-router-dom'
 import GithubReducer from './GithubReducers'
 
 const GithubContext = createContext()
@@ -22,6 +23,7 @@ export const GithubContextProvider = ({ children }) => {
         Authorization: `token ${token}`,
       },
     })
+    if (response.status === 404) return <Navigate to="/not-found" />
 
     const { items } = await response.json()
     dispatch({
