@@ -11,6 +11,7 @@ export const GithubContextProvider = ({ children }) => {
     users: [],
     isLoading: false,
     user: {},
+    repos: [],
   }
   const [state, dispatch] = useReducer(GithubReducer, initialState)
 
@@ -24,13 +25,27 @@ export const GithubContextProvider = ({ children }) => {
       },
     })
     if (response.status === 404) return <Navigate to="/not-found" />
-
-    const { items } = await response.json()
-    dispatch({
-      type: 'FETCH_USERS',
-      payload: items,
-    })
+    else {
+      const { items } = await response.json()
+      dispatch({
+        type: 'FETCH_USERS',
+        payload: items,
+      })
+    }
   }
+  //get User repo results
+  const getUserRepos = async (user) => {
+    const response = await fetch(`${url}/users/${user}/repos`)
+    if (response.status === 404) return <Navigate to="/not-found" />
+    else {
+      const data = await response.json()
+      dispatch({
+        type: 'FETCH_REPOS',
+        payload: data,
+      })
+    }
+  }
+
   //get user details
   const getUser = async (login) => {
     setLoading()
@@ -56,9 +71,11 @@ export const GithubContextProvider = ({ children }) => {
         users: state.users,
         user: state.user,
         isLoading: state.isLoading,
+        repos: state.repos,
         searchUsers,
         clearUsers,
         getUser,
+        getUserRepos,
       }}
     >
       {children}
